@@ -49,7 +49,7 @@ namespace TGMTAts{
         public static void Load(){
             Config.Load(Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), 
-                "TGMT.cfg")
+                "TGMTConfig.txt")
             );
 
             if (Config.Debug) {

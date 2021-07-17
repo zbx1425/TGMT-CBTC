@@ -21,7 +21,7 @@ namespace TGMTAts {
             Array.Sort(limits, (a, b) => a.Location.CompareTo(b.Location));
             int pointer = 0;
             double currentTarget = Config.LessInf, nextTarget = Config.LessInf;
-            while (limits[pointer].Location < location - Config.StationDepartRequestTime) pointer++;
+            while (limits[pointer].Location < location - Config.DepartRequestTime) pointer++;
             for (int i = 0; i < limits.Length; i++) {
                 currentTarget = Math.Min(currentTarget, limits[i].AtLocation(location, idealdecel, voffset));
             }

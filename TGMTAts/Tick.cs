@@ -34,7 +34,7 @@ namespace TGMTAts {
             CalculatedLimit maximumCurve = null, targetCurve = null, recommendCurve = null;
             switch (signalMode) {
                 case 0:
-                    ebSpeed = 25;
+                    ebSpeed = Config.RMSpeed;
                     recommendSpeed = -10;
                     targetdistance = -10;
                     targetspeed = -10;
@@ -44,15 +44,15 @@ namespace TGMTAts {
                     // ITC
                     if (selectedMode > 0 && driveMode == 0) driveMode = 1;
                     maximumCurve = CalculatedLimit.Calculate(location,
-                        Config.RecommendDeceleration, Config.RecommendSpeedOffset, movementEndpoint, trackLimit);
+                        Config.EbPatternDeceleration, Config.RecommendSpeedOffset, movementEndpoint, trackLimit);
                     targetCurve = CalculatedLimit.Calculate(location,
-                        Config.RecommendDeceleration, 0, movementEndpoint, trackLimit);
+                        Config.EbPatternDeceleration, 0, movementEndpoint, trackLimit);
                     recommendCurve = CalculatedLimit.Calculate(location,
                         Config.RecommendDeceleration, 0, StationManager.RecommendCurve(), movementEndpoint, trackLimit);
                     // 释放速度
                     if (movementEndpoint.Location - location < Config.ReleaseSpeedDistance 
                         && movementEndpoint.Location > location
-                        && state.Speed < 25 && !releaseSpeed) { //TODO: Magic number
+                        && state.Speed < Config.ReleaseSpeed && !releaseSpeed) {
                         ackMessage = 2;
                     }
                     break;
@@ -62,15 +62,15 @@ namespace TGMTAts {
                     movementEndpoint = StationManager.CTCEndpoint();
                     if (selectedMode > 0 && driveMode == 0) driveMode = 1;
                     maximumCurve = CalculatedLimit.Calculate(location,
-                        Config.RecommendDeceleration, Config.RecommendSpeedOffset, movementEndpoint, trackLimit);
+                        Config.EbPatternDeceleration, Config.RecommendSpeedOffset, movementEndpoint, trackLimit);
                     targetCurve = CalculatedLimit.Calculate(location,
-                       Config.RecommendDeceleration, 0, movementEndpoint, trackLimit);
+                       Config.EbPatternDeceleration, 0, movementEndpoint, trackLimit);
                     recommendCurve = CalculatedLimit.Calculate(location,
                         Config.RecommendDeceleration, 0, StationManager.RecommendCurve(), movementEndpoint, trackLimit);
                     break;
                 default:
                     // fallback
-                    ebSpeed = 110;
+                    ebSpeed = Config.MaxSpeed;
                     recommendSpeed = -10;
                     targetspeed = 0;
                     targetdistance = -10;
@@ -92,8 +92,8 @@ namespace TGMTAts {
                     releaseSpeed = false;
                 }
                 if (releaseSpeed) {
-                    ebSpeed = Math.Max(ebSpeed, 25); //TODO: Magic number
-                    recommendSpeed = Math.Max(recommendSpeed, 20);
+                    ebSpeed = Math.Max(ebSpeed, Config.ReleaseSpeed);
+                    recommendSpeed = Math.Max(recommendSpeed, Config.ReleaseSpeed - Config.RecommendSpeedOffset);
                 }
             }
 
@@ -105,7 +105,7 @@ namespace TGMTAts {
             panel[28] = (driveMode > 0) ? doorMode : 0;
 
             // 显示临时预选模式
-            if (state.Speed != 0 || time > selectModeStartTime + 5000) { //TODO: Magic number
+            if (state.Speed != 0 || time > selectModeStartTime + Config.ModeSelectTimeout * 1000) {
                 selectingMode = -1;
                 selectModeStartTime = 0;
             }
@@ -133,7 +133,7 @@ namespace TGMTAts {
             if (signalMode > 1) {
                 if (state.Speed == 0 
                     && Math.Abs(StationManager.NextStation.StopPosition - location) < Config.DoorEnableWindow
-                    && time / 1000 > StationManager.NextStation.DepartureTime - Config.StationDepartRequestTime) {
+                    && time / 1000 > StationManager.NextStation.DepartureTime - Config.DepartRequestTime) {
                     panel[32] = 2;
                 } else if (doorOpen && time - doorOpenTime >= 3000) {
                     panel[32] = 1;
@@ -263,7 +263,7 @@ namespace TGMTAts {
             // 后退监督: 每1m一次紧制 (先这么做着, 有些地区似乎是先1m之后每次0.5m)
             if (handles.Reverser == -1) {
                 if (location > reverseStartLocation) reverseStartLocation = location;
-                if (location < reverseStartLocation - 1) {
+                if (location < reverseStartLocation - Config.ReverseStepDistance) {
                     if (state.Speed == 0 && handles.Power == 0) {
                         reverseStartLocation = location;
                     } else {
@@ -357,6 +357,25 @@ namespace TGMTAts {
                     // RM-IXL, 门要是开了就当它按了门允许, 没有车门使能和停车窗口指示
                     panel[26] = 0;
                     panel[27] = doorOpen ? 5 : 0;
+                }
+            }
+
+            // 信号灯
+            if (signalMode >= 2) {
+                panel[41] = 2;
+            } else {
+                if (doorOpen) {
+                    if (time - doorOpenTime >= 1000) {
+                        panel[41] = 1;
+                    } else {
+                        panel[41] = 0;
+                    }
+                } else {
+                    if (time - doorCloseTime >= 1000) {
+                        panel[41] = 0;
+                    } else {
+                        panel[41] = 1;
+                    }
                 }
             }
 

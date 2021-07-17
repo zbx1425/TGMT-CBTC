@@ -34,7 +34,7 @@ namespace TGMTAts {
         public static int GetCmdNotch(double speed, double recSpeed) {
             var decel = GetCmdDecel(speed, recSpeed);
             if (decel > 0) {
-                // 限制更改制动指令的时间，以免反复横跳
+                // 限制更改制动指令的时间，以免过于频繁地反复横跳
                 if (TGMTAts.time - lastBrakeOutputTime > 250) {
                     outputNotch = -(int)Math.Round(Math.Min(decel / -Config.MaxServiceDeceleration, 1)
                         * TGMTAts.vehicleSpec.BrakeNotches - 1);
