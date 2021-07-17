@@ -15,6 +15,8 @@ namespace TGMTAts {
         public static Graphics g800, g1024, gtdt;
 
         public static void Initialize() {
+            var imgDir = Config.ImageAssetPath;
+
             bmp800 = new Bitmap(800, 600, PixelFormat.Format32bppRgb);
             g800 = Graphics.FromImage(bmp800);
             bmp1024 = new Bitmap(1024, 1024, PixelFormat.Format32bppRgb);
@@ -156,7 +158,6 @@ namespace TGMTAts {
         static Pen ackPen = new Pen(Color.Yellow, 4);
         static Brush[] targetColor = new Brush[] { new SolidBrush(Color.Red), new SolidBrush(Color.Orange), new SolidBrush(Color.Green) };
         static Brush[] overspeed = new Brush[] { new SolidBrush(Color.Black), new SolidBrush(Color.Orange), new SolidBrush(Color.Red) };
-        static string imgDir = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)), "TGMT");
         static int hmi, ackcmd, atoctrl, dormode, dorrel, drvmode, emergency, fault, departure, menu,
             selmode, sigmode, special, stopsig, num0, numn0, colon;
     }

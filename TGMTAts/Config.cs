@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace TGMTAts {
 
     public static class Config {
 
         public const double LessInf = 1000000;
+        public static string PluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         public static bool Debug = false;
 
@@ -31,6 +33,9 @@ namespace TGMTAts {
 
         public static double TDTFreezeDistance = 10;
 
+        public static string HarmonyPath = "0Harmony.dll";
+        public static string ImageAssetPath = "TGMT";
+
         private static void Cfg(this Dictionary<string, string> configDict, string key, ref double param) {
             if (configDict.ContainsKey(key)) {
                 var value = configDict[key].ToLowerInvariant();
@@ -50,6 +55,12 @@ namespace TGMTAts {
             if (configDict.ContainsKey(key)) {
                 var str = configDict[key].ToLowerInvariant();
                 param = (str == "true" || str == "1");
+            }
+        }
+
+        private static void Cfg(this Dictionary<string, string> configDict, string key, ref string param) {
+            if (configDict.ContainsKey(key)) {
+                param = configDict[key];
             }
         }
 
@@ -101,6 +112,11 @@ namespace TGMTAts {
 
             dict.Cfg("tdtfreezedistance", ref TDTFreezeDistance);
             dict.Cfg("modeselecttimeout", ref ModeSelectTimeout);
+
+            dict.Cfg("harmonypath", ref HarmonyPath);
+            dict.Cfg("imageassetpath", ref ImageAssetPath);
+            HarmonyPath = Path.GetFullPath(Path.Combine(PluginDir, HarmonyPath));
+            ImageAssetPath = Path.GetFullPath(Path.Combine(PluginDir, ImageAssetPath));
         }
 
     }

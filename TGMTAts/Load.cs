@@ -43,15 +43,15 @@ namespace TGMTAts{
         public static Form debugWindow;
         public static bool pluginReady = false;
 
-        public static HarmonyLib.Harmony harmony = new HarmonyLib.Harmony("cn.zbx1425.bve.trainguardmt");
+        public static HarmonyLib.Harmony harmony;
+
+        static TGMTAts() {
+            Config.Load(Path.Combine(Config.PluginDir, "TGMTConfig.txt"));
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+        }
 
         [DllExport(CallingConvention.StdCall)]
         public static void Load(){
-            Config.Load(Path.Combine(
-                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), 
-                "TGMTConfig.txt")
-            );
-
             if (Config.Debug) {
                 new Thread(() => {
                     debugWindow = new DebugWindow();
@@ -59,8 +59,16 @@ namespace TGMTAts{
                 }).Start();
             }
 
+            harmony = new HarmonyLib.Harmony("cn.zbx1425.bve.trainguardmt");
             harmony.PatchAll();
             TGMTPainter.Initialize();
+        }
+
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) {
+            if (args.Name.Contains("Harmony")) {
+                return Assembly.LoadFile(Config.HarmonyPath);
+            }
+            return null;
         }
 
         [DllExport(CallingConvention.StdCall)]

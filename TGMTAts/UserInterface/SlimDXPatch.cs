@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using HarmonyLib;
 using SlimDX.Direct3D9;
+using HarmonyLib;
 
 namespace TGMTAts {
 
