@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace TGMTAts {
-
+    
     static class PreTrainManager {
 
         public class PassCommand {

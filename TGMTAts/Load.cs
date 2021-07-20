@@ -66,8 +66,12 @@ namespace TGMTAts {
             }
 
             harmony = new HarmonyLib.Harmony("cn.zbx1425.bve.trainguardmt");
-            harmony.PatchAll();
-            TGMTPainter.Initialize();
+            try {
+                TextureManager.ApplyPatch();
+                TGMTPainter.Initialize();
+            } catch (Exception ex) {
+               MessageBox.Show(ex.ToString());
+            }
         }
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) {

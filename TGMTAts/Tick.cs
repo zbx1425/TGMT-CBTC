@@ -387,6 +387,7 @@ namespace TGMTAts {
             }
 
             // 刷新HMI, TDT, 信号机材质，为了减少对FPS影响把它限制到最多一秒十次
+            if (lastDrawTime > state.Time) lastDrawTime = 0;
             if (state.Time - lastDrawTime > 100) {
                 lastDrawTime = state.Time;
                 TextureManager.UpdateTexture(TextureManager.HmiTexture, TGMTPainter.PaintHMI(panel, state));
