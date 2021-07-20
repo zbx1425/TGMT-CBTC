@@ -13,7 +13,7 @@ namespace TGMTAts {
 
         private const int speedMultiplier = 4;
 
-        static int lastTime = 0;
+        static int lastDrawTime = 0;
 
         [DllExport(CallingConvention.StdCall)]
         public static AtsHandles Elapse(AtsVehicleState state, IntPtr hPanel, IntPtr hSound) {
@@ -27,7 +27,7 @@ namespace TGMTAts {
             var handles = new AtsHandles { Power = pPower, Brake = pBrake,
                 Reverser = pReverser, ConstantSpeed = AtsCscInstruction.Continue };
 
-            double ebSpeed = 0, recommendSpeed = 0, targetspeed = 0, targetdistance = 0;
+            double ebSpeed = 0, recommendSpeed = 0, targetSpeed = 0, targetDistance = 0;
             trackLimit.Update(location);
             StationManager.Update(state, doorOpen);
 
@@ -36,8 +36,8 @@ namespace TGMTAts {
                 case 0:
                     ebSpeed = Config.RMSpeed;
                     recommendSpeed = -10;
-                    targetdistance = -10;
-                    targetspeed = -10;
+                    targetDistance = -10;
+                    targetSpeed = -10;
                     driveMode = 0;
                     break;
                 case 1:
@@ -62,18 +62,21 @@ namespace TGMTAts {
                     movementEndpoint = StationManager.CTCEndpoint();
                     if (selectedMode > 0 && driveMode == 0) driveMode = 1;
                     maximumCurve = CalculatedLimit.Calculate(location,
-                        Config.EbPatternDeceleration, Config.RecommendSpeedOffset, movementEndpoint, trackLimit);
+                        Config.EbPatternDeceleration, Config.RecommendSpeedOffset, movementEndpoint,
+                        PreTrainManager.GetEndpoint(), trackLimit);
                     targetCurve = CalculatedLimit.Calculate(location,
-                       Config.EbPatternDeceleration, 0, movementEndpoint, trackLimit);
+                        Config.EbPatternDeceleration, 0, movementEndpoint, 
+                        PreTrainManager.GetEndpoint(), trackLimit);
                     recommendCurve = CalculatedLimit.Calculate(location,
-                        Config.RecommendDeceleration, 0, StationManager.RecommendCurve(), movementEndpoint, trackLimit);
+                        Config.RecommendDeceleration, 0, StationManager.RecommendCurve(), 
+                        PreTrainManager.GetEndpoint(), movementEndpoint, trackLimit);
                     break;
                 default:
                     // fallback
                     ebSpeed = Config.MaxSpeed;
                     recommendSpeed = -10;
-                    targetspeed = 0;
-                    targetdistance = -10;
+                    targetSpeed = 0;
+                    targetDistance = -10;
                     break;
             }
             if (maximumCurve != null) {
@@ -82,8 +85,8 @@ namespace TGMTAts {
                 recommendSpeed = Math.Min(ebSpeed - Config.RecommendSpeedOffset, 
                     Math.Max(0, recommendCurve.CurrentTarget));
                 nextLimit = targetCurve.NextLimit;
-                targetdistance = targetCurve.NextLimit.Location - location;
-                targetspeed = targetCurve.NextLimit.Limit;
+                targetDistance = targetCurve.NextLimit.Location - location;
+                targetSpeed = targetCurve.NextLimit.Limit;
                 if (location > movementEndpoint.Location) {
                     // 如果已冲出移动授权终点，释放速度无效
                     if (releaseSpeed) Log("超出了移动授权终点, 释放速度无效");
@@ -102,7 +105,7 @@ namespace TGMTAts {
             panel[22] = selectedMode;
             panel[24] = driveMode;
             panel[25] = signalMode;
-            panel[28] = (driveMode > 0) ? doorMode : 0;
+            panel[28] = (driveMode > 0) ? (driveMode > 1 ? doorMode : 1) : 0;
 
             // 显示临时预选模式
             if (state.Speed != 0 || time > selectModeStartTime + Config.ModeSelectTimeout * 1000) {
@@ -115,25 +118,28 @@ namespace TGMTAts {
             }
 
             // 显示目标速度、建议速度、干预速度
-            panel[11] = distanceToPixel(targetdistance);
-            panel[19] = (int)targetdistance;
+            if (doorOpen) {
+                targetDistance = 0;
+                targetSpeed = -10;
+            }
+            panel[11] = distanceToPixel(targetDistance);
+            panel[19] = (int)targetDistance;
             panel[16] = (int)(ebSpeed * speedMultiplier);
             if (driveMode < 2) {
                 panel[15] = (int)(recommendSpeed * speedMultiplier);
             } else {
                 panel[15] = -1;
             }
-            distanceToColor(targetspeed, targetdistance, panel);
-            targetspeed = Math.Min(targetspeed, Config.MaxSpeed);
-            panel[17] = (int)targetspeed;
-            panel[18] = (targetspeed < 0) ? 1 : 0;
+            distanceToColor(targetSpeed, targetDistance, panel);
+            targetSpeed = Math.Min(targetSpeed, Config.MaxSpeed);
+            panel[17] = (int)targetSpeed;
+            panel[18] = (targetSpeed < 0) ? 1 : 0;
             panel[29] = panel[31] = 0;
 
             // 显示出发与屏蔽门信息
-            if (signalMode > 1) {
-                if (state.Speed == 0 
-                    && Math.Abs(StationManager.NextStation.StopPosition - location) < Config.DoorEnableWindow
-                    && time / 1000 > StationManager.NextStation.DepartureTime - Config.DepartRequestTime) {
+            if (signalMode > 1 && state.Speed == 0) {
+                if (Math.Abs(StationManager.NextStation.StopPosition - location) < Config.DoorEnableWindow
+                    && time > StationManager.NextStation.DepartureTime - Config.DepartRequestTime * 1000) {
                     panel[32] = 2;
                 } else if (doorOpen && time - doorOpenTime >= 3000) {
                     panel[32] = 1;
@@ -143,7 +149,7 @@ namespace TGMTAts {
             } else {
                 panel[32] = 0;
             }
-            if (signalMode >= 2) {
+            if (signalMode >= 2 && state.Speed == 0) {
                 if (doorOpen) {
                     if (time - doorOpenTime >= 1000) {
                         panel[29] = 3;
@@ -165,6 +171,7 @@ namespace TGMTAts {
 
             // ATO
             panel[40] = 0;
+            Ato.UpdateAccel(state.Speed, recommendSpeed);
             if (signalMode > 0) {
                 if (handles.Power != 0 || handles.Brake != 0 || handles.Reverser != 1) {
                     driveMode = 1;
@@ -174,7 +181,7 @@ namespace TGMTAts {
                 }
                 if (driveMode >= 2) {
                     panel[40] = 1;
-                    var notch = Ato.GetCmdNotch(state.Speed, recommendSpeed);
+                    var notch = Ato.GetCmdNotch(state.Speed, recommendSpeed, ebSpeed);
                     if (notch < 0) {
                         handles.Power = 0;
                         handles.Brake = -notch;
@@ -380,8 +387,8 @@ namespace TGMTAts {
             }
 
             // 刷新HMI, TDT, 信号机材质，为了减少对FPS影响把它限制到最多一秒十次
-            if (state.Time - lastTime > 100) {
-                lastTime = state.Time;
+            if (state.Time - lastDrawTime > 100) {
+                lastDrawTime = state.Time;
                 TextureManager.UpdateTexture(TextureManager.HmiTexture, TGMTPainter.PaintHMI(panel, state));
                 TextureManager.UpdateTexture(TextureManager.TdtTexture, TGMTPainter.PaintTDT(panel, state));
             }

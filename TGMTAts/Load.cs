@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using System.Linq;
 using System.Reflection;
 
-namespace TGMTAts{
+namespace TGMTAts {
 	public static partial class TGMTAts {
 
         public static int[] panel = new int[256];
@@ -50,8 +50,14 @@ namespace TGMTAts{
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         }
 
+        const string ExpectedHash = "9758E6EA853B042ED49582081371764F43BC8E4DC7955C2B6D949015B984C8E2";
+
         [DllExport(CallingConvention.StdCall)]
         public static void Load(){
+            if (FolderHash.Calculate(Config.ImageAssetPath) != ExpectedHash) {
+                throw new InvalidDataException("TGMT Image data is not original!");
+            }
+
             if (Config.Debug) {
                 new Thread(() => {
                     debugWindow = new DebugWindow();
@@ -76,13 +82,6 @@ namespace TGMTAts{
             vehicleSpec = spec;
         }
 
-        [DllExport(CallingConvention.StdCall)]
-        public static void Initialize(int initialHandlePosition) {
-            driveMode = 1;
-            signalMode = 2;
-            FixIncompatibleModes();
-        }
-
         static void FixIncompatibleModes() {
             if (selectedMode == 0) signalMode = 0; // 预选了IXL
             if (selectedMode == 1 && signalMode > 1) signalMode = 1; // 预选了ITC
@@ -95,11 +94,11 @@ namespace TGMTAts{
             if (signalMode == 0 && driveMode > 0) driveMode = 0; // 没信号就得是RM
         }
 
-        static int ConvertTime(int human) {
-            var hrs = human / 10000 % 60;
-            var min = human / 100 % 60;
-            var src = human % 60;
-            return hrs * 3600 + min * 60 + src;
+        public static int ConvertTime(int human) {
+            var hrs = human / 10000;
+            var min = human / 100 % 100;
+            var sec = human % 100;
+            return hrs * 3600 + min * 60 + sec;
         }
 
         [DllExport(CallingConvention.StdCall)]

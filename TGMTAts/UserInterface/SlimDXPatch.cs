@@ -14,10 +14,9 @@ namespace TGMTAts {
     class SlimDXTexturePatch {
 
         static void Postfix(ref Texture __result, Device device, string fileName) {
-            // zbx1425.tgmttdt.png
-            if (fileName.EndsWith("stop6.png", StringComparison.OrdinalIgnoreCase)) {
+            if (fileName.EndsWith(Config.TDTImageSuffix, StringComparison.OrdinalIgnoreCase)) {
                 __result = TextureManager.CreateTdtTexture(device);
-            } else if (fileName.EndsWith("zbx1425.tgmthmi.png", StringComparison.OrdinalIgnoreCase)) {
+            } else if (fileName.EndsWith(Config.HMIImageSuffix, StringComparison.OrdinalIgnoreCase)) {
                 __result = TextureManager.CreateHmiTexture(device);
             }
         }

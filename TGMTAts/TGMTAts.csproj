@@ -55,6 +55,8 @@
     <Compile Include="Ato.cs" />
     <Compile Include="AtsStructs.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="FolderHash.cs" />
+    <Compile Include="Patterns\PreTrainManager.cs" />
     <Compile Include="UserInterface\DebugWindow.cs">
       <SubType>Form</SubType>
     </Compile>

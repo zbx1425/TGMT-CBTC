@@ -28,7 +28,8 @@ namespace TGMTAts {
             }
             sb.AppendLine();
             sb.AppendFormat("授权终点 : {0,6}\n", D(TGMTAts.movementEndpoint.Location));
-            sb.AppendFormat("授权终点 : {0,6}\n", D(TGMTAts.movementEndpoint.Location));
+            var pretrain = PreTrainManager.GetEndpoint();
+            sb.AppendFormat("前车信息 : {0,6} {1,-4}\n", D(pretrain.Location), D(pretrain.Limit));
             sb.AppendFormat("车站     : {0,6} {1} {2}\n",
                 D(StationManager.NextStation.StopPosition), 
                 StationManager.Arrived ? "站内停止" : "",
@@ -44,7 +45,7 @@ namespace TGMTAts {
             sb.AppendFormat("ATO 级位 : {0}\n", Ato.outputNotch);
             sb.AppendLine();
 
-            foreach (var msg in TGMTAts.debugMessages.Skip(Math.Max(0, TGMTAts.debugMessages.Count() - 10))) {
+            foreach (var msg in TGMTAts.debugMessages.Skip(Math.Max(0, TGMTAts.debugMessages.Count() - 8))) {
                 sb.AppendLine(msg);
             }
             //sb.AppendFormat("Signal  : {0,6} {1,-4}\n", D(TGMTAts.signalLimit.Location), D(TGMTAts.signalLimit.Limit));
@@ -57,14 +58,14 @@ namespace TGMTAts {
         }
 
         private string D(double d) {
-            if (d < -100000) return "-Inf";
-            if (d > 100000) return "Inf";
+            if (d <= -Config.LessInf) return "-Inf";
+            if (d >= Config.LessInf) return "Inf";
             return ((int)d).ToString();
         }
 
         private string D(int d) {
-            if (d < -100000) return "-Inf";
-            if (d > 100000) return "Inf";
+            if (d <= -Config.LessInf) return "-Inf";
+            if (d >= Config.LessInf) return "Inf";
             return d.ToString();
         }
     }

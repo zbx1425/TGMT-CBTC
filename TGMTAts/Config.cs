@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace TGMTAts {
 
     public static class Config {
 
-        public const double LessInf = 1000000;
+        public const double LessInf = 100000000;
         public static string PluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         public static bool Debug = false;
@@ -17,6 +18,7 @@ namespace TGMTAts {
         public static double RecommendDeceleration = -2;
         public static double EbPatternDeceleration = -3;
         public static double MaxServiceDeceleration = -4;
+        public static List<KeyValuePair<int, double>> Acceleration = new List<KeyValuePair<int, double>>();
 
         public static double ReverseStepDistance = 5;
         public static double DoorEnableWindow = 1;
@@ -27,6 +29,7 @@ namespace TGMTAts {
         public static double StationStartDistance = 100;
         public static double StationEndDistance = 5;
         public static double StationMotionEndpoint = 3;
+        public static double CTCSafetyDistance = 30;
 
         public static double DepartRequestTime = 10;
         public static double ModeSelectTimeout = 5;
@@ -35,6 +38,10 @@ namespace TGMTAts {
 
         public static string HarmonyPath = "0Harmony.dll";
         public static string ImageAssetPath = "TGMT";
+
+        public static string HMIImageSuffix = "zbx1425_tgmt_hmi.png";
+        public static string TDTImageSuffix = "zbx1425_tgmt_tdt.png";
+        public static string SignalImageSuffix = "zbx1425_tgmt_signal.png";
 
         private static void Cfg(this Dictionary<string, string> configDict, string key, ref double param) {
             if (configDict.ContainsKey(key)) {
@@ -100,6 +107,7 @@ namespace TGMTAts {
             dict.Cfg("maxservicedeceleration", ref MaxServiceDeceleration);
             dict.Cfg("ebpatterndeceleration", ref EbPatternDeceleration);
 
+            dict.Cfg("ctcsafetydistance", ref CTCSafetyDistance);
             dict.Cfg("reversestepdistance", ref ReverseStepDistance);
             dict.Cfg("doorenablewindow", ref DoorEnableWindow);
             dict.Cfg("releasespeed", ref ReleaseSpeed);
@@ -117,6 +125,19 @@ namespace TGMTAts {
             dict.Cfg("imageassetpath", ref ImageAssetPath);
             HarmonyPath = Path.GetFullPath(Path.Combine(PluginDir, HarmonyPath));
             ImageAssetPath = Path.GetFullPath(Path.Combine(PluginDir, ImageAssetPath));
+
+            dict.Cfg("hmiimagesuffix", ref HMIImageSuffix);
+            dict.Cfg("tdtimagesuffix", ref TDTImageSuffix);
+            dict.Cfg("signalimagesuffix", ref SignalImageSuffix);
+
+            var accelText = "0:3.3";
+            dict.Cfg("acceleration", ref accelText);
+            foreach (var tokens in accelText.Split(',').Select(t => t.Split(':'))) {
+                var speed = int.Parse(tokens[0].Trim());
+                var accel = double.Parse(tokens[1].Trim());
+                Acceleration.Add(new KeyValuePair<int, double>(speed, accel));
+            }
+            Acceleration.Sort((a, b) => a.Key.CompareTo(b.Key));
         }
 
     }

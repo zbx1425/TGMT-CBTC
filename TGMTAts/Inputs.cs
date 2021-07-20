@@ -72,32 +72,32 @@ namespace TGMTAts{
                 case -16777214:
                     trackLimit.SetBeacon(data);
                     break;
-                case 906688001:
-                    signalMode = data.Optional;
-                    FixIncompatibleModes();
-                    break;
-                case 906688002:
-                    selectedMode = data.Optional;
-                    FixIncompatibleModes();
-                    break;
-                case 906688003:
+                case 96811:
                     deviceCapability = data.Optional;
                     FixIncompatibleModes();
                     break;
-                case 906688004:
+                case 96812:
                     doorMode = data.Optional;
                     break;
-                case 906688010:
-                case 906688011:
+                case 96813:
+                    signalMode = data.Optional / 10 % 10;
+                    selectedMode = data.Optional / 100 % 10;
+                    driveMode = 1;
+                    FixIncompatibleModes();
+                    break;
+                case 96810:
                     trackLimit.SetBeacon(data);
                     break;
-                case 906688020:
-                case 906688021:
-                case 906688022:
-                case 906688023:
+                case 96820:
+                case 96821:
+                case 96822:
+                case 96823:
                     StationManager.SetBeacon(data);
                     break;
-
+                case 96828:
+                case 96829:
+                    PreTrainManager.SetBeacon(data);
+                    break;
                 case 96801:
                 case 96802:
                     // TGMT 主
@@ -123,6 +123,26 @@ namespace TGMTAts{
                     FixIncompatibleModes();
                     break;
             }
+        }
+
+        [DllExport(CallingConvention.StdCall)]
+        public static void Initialize(int initialHandlePosition) {
+            driveMode = 1;
+            FixIncompatibleModes();
+
+            lastDrawTime = 0;
+            movementEndpoint = SpeedLimit.inf;
+            nextLimit = null;
+            selectingMode = -1;
+            selectModeStartTime = 0;
+            pluginReady = false;
+            reverseStartLocation = Config.LessInf;
+            releaseSpeed = false;
+            ebState = 0;
+            ackMessage = 0;
+
+            Ato.ResetCache();
+            PreTrainManager.ResetCache();
         }
 
         public static int time;

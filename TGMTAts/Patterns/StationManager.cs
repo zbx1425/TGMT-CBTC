@@ -24,18 +24,18 @@ namespace TGMTAts {
 
         public static void SetBeacon(TGMTAts.AtsBeaconData data) {
             switch (data.Type) {
-                case 906688020:
+                case 96820:
                     NextStation.StopPosition = data.Optional;
                     TGMTAts.Log("车站停车位置 " + NextStation.StopPosition.ToString());
                     break;
-                case 906688021:
+                case 96821:
                     NextStation.DoorOpenType = data.Optional;
                     break;
-                case 906688022:
-                    NextStation.RouteOpenTime = data.Optional;
+                case 96822:
+                    NextStation.RouteOpenTime = TGMTAts.ConvertTime(data.Optional) * 1000;
                     break;
-                case 906688023:
-                    NextStation.DepartureTime = data.Optional;
+                case 96823:
+                    NextStation.DepartureTime = TGMTAts.ConvertTime(data.Optional) * 1000;
                     break;
             }
         }
@@ -55,37 +55,6 @@ namespace TGMTAts {
                 Arrived = false;
                 TGMTAts.Log("已出站");
             }
-            /* if (Stations.Count > 0) {
-                int stapointer = 0;
-                while ((Stations[stapointer].StopPosition + Config.StationEndDistance - 1 < location)
-                    && stapointer < Stations.Count) stapointer++;
-                if (stapointer >= Stations.Count) {
-                    NextStation = null;
-                    Copy(inf);
-                    EndPoint.Copy(inf);
-                } else {
-                    NextStation = Stations[stapointer];
-                    if (ArrivePtr == stapointer && IsRouteOpen(location, state, stapointer)) {
-                        Copy(inf);
-                        EndPoint.Copy(inf);
-                    } else {
-                        this.Limit = 0;
-                        this.Location = Station.StopPosition;
-                        this.EndPoint.Limit = 0;
-                        this.EndPoint.Location = Station.StopPosition + Config.StationMotionEndpoint;
-                    }
-                }
-                if (ArrivePtr < 0 && Math.Abs(Stations[stapointer].StopPosition - location) < Config.DoorEnableWindow &&
-                    state.Speed == 0.0 && doorState) {
-                    ArrivePtr = stapointer;
-                    ArriveTime = state.Time / 1000;
-                }
-                if (Stations[stapointer].StopPosition - location > 200) ArrivePtr = -1;
-            } else {
-                NextStation = null;
-                Copy(inf);
-                EndPoint.Copy(inf);
-            } */
         }
 
         public static SpeedLimit RecommendCurve() {
@@ -101,7 +70,7 @@ namespace TGMTAts {
         }
 
         public static SpeedLimit CTCEndpoint() {
-            if (TGMTAts.time / 1000 > NextStation.RouteOpenTime) {
+            if (TGMTAts.time > NextStation.RouteOpenTime) {
                 return SpeedLimit.inf;
             } else {
                 return new SpeedLimit(0, NextStation.StopPosition + Config.StationMotionEndpoint);

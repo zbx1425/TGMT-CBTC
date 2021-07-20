@@ -19,11 +19,11 @@ namespace TGMTAts {
                     this.trackLimits.Add(item);
                 }
                 //adm(item.Location.ToString()+" LIMIT "+limit.ToString(),OpenBveApi.Colors.MessageColor.White,2000);
-            } else if (data.Type == 906688010) {
-                if (trackLimits.Any(s => s.Location == data.Optional)) return;
-                this.trackLimits.Add(new SpeedLimit(0, data.Optional));
-            } else if (data.Type == 906688011) {
-                this.trackLimits[trackLimits.Count - 1].Limit = data.Optional;
+            } else if (data.Type == 96810) {
+                var speed = data.Optional % 1000;
+                var location = data.Optional / 1000;
+                if (trackLimits.Any(s => s.Location == location)) return;
+                this.trackLimits.Add(new SpeedLimit(speed, location));
             }
             this.trackLimits.Sort((x, y) => x.Location.CompareTo(y.Location));
         }
