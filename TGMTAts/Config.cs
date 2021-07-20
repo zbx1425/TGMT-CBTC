@@ -31,6 +31,8 @@ namespace TGMTAts {
         public static double StationMotionEndpoint = 3;
         public static double CTCSafetyDistance = 30;
 
+        public static double TrainLength = 0;
+
         public static double DepartRequestTime = 10;
         public static double ModeSelectTimeout = 5;
 
@@ -117,6 +119,8 @@ namespace TGMTAts {
             dict.Cfg("stationenddistance", ref StationEndDistance);
             dict.Cfg("stationmotionendpoint", ref StationMotionEndpoint);
             dict.Cfg("departrequesttime", ref DepartRequestTime);
+
+            dict.Cfg("trainlength", ref TrainLength);
 
             dict.Cfg("tdtfreezedistance", ref TDTFreezeDistance);
             dict.Cfg("modeselecttimeout", ref ModeSelectTimeout);

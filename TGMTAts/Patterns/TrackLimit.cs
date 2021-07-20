@@ -7,7 +7,8 @@ using System.Text;
 namespace TGMTAts {
     public class TrackLimit : SpeedLimit {
         public List<SpeedLimit> trackLimits = new List<SpeedLimit>();
-        public SpeedLimit previous = SpeedLimit.inf;
+        public SpeedLimit last = SpeedLimit.inf;
+        public SpeedLimit current = SpeedLimit.inf;
         public SpeedLimit next = SpeedLimit.inf;
 
         public void SetBeacon(TGMTAts.AtsBeaconData data) {
@@ -30,33 +31,46 @@ namespace TGMTAts {
 
         public void Update(double location) {
             if (trackLimits.Count == 0) {
-                previous = SpeedLimit.inf;
+                current = SpeedLimit.inf;
                 next = SpeedLimit.inf;
                 return;
             }
             int pointer = 0;
             while (pointer < trackLimits.Count && trackLimits[pointer].Location < location) pointer++;
             if (pointer == trackLimits.Count) {
-                previous = trackLimits.Last();
+                if (pointer > 1) {
+                    last = trackLimits[pointer - 2];
+                } else {
+                    last = SpeedLimit.inf;
+                }
+                current = trackLimits[pointer - 1];
                 next = SpeedLimit.inf;
-            } else if (pointer == 0) {
-                previous = SpeedLimit.inf;
-                next = trackLimits.First();
             } else {
-                previous = trackLimits[pointer - 1];
+                if (pointer > 1) {
+                    last = trackLimits[pointer - 2];
+                } else {
+                    last = SpeedLimit.inf;
+                }
+                if (pointer > 0) {
+                    current = trackLimits[pointer - 1];
+                } else {
+                    current = SpeedLimit.inf;
+                }
                 next = trackLimits[pointer];
             }
             Copy(next);
         }
 
-        // Only considering previous and next!
+        // Only considering last, current and next!
         public override double AtLocation(double location, double idealDecel, double vOffset = 0) {
             if (location >= next.Location) {
                 return next.Limit + vOffset;
-            } else if (location >= previous.Location) {
-                return Math.Min(previous.Limit + vOffset, next.AtLocation(location, idealDecel, vOffset));
+            } else if (current.Limit > last.Limit && location < current.Location + Config.TrainLength) {
+                return last.Limit + vOffset;
+            } else if (location >= current.Location) {
+                return Math.Min(current.Limit + vOffset, next.AtLocation(location, idealDecel, vOffset));
             } else {
-                return previous.AtLocation(location, idealDecel, vOffset);
+                return current.AtLocation(location, idealDecel, vOffset);
             }
         }
     }

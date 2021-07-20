@@ -35,9 +35,11 @@ namespace TGMTAts {
                 StationManager.Arrived ? "站内停止" : "",
                 StationManager.Arrived ? "已到达" : ""
             );
-            sb.AppendFormat("线路限速 : {0,6} {1,-4} -> {2,6} {3,-4}\n",
-            D(TGMTAts.trackLimit.previous.Location), D(TGMTAts.trackLimit.previous.Limit),
-            D(TGMTAts.trackLimit.next.Location), D(TGMTAts.trackLimit.next.Limit));
+            sb.AppendFormat("线路限速 : {0,6} {1,-4} -> [{2,6} {3,-4}] -> {4,6} {5,-4}\n",
+                D(TGMTAts.trackLimit.last.Location), D(TGMTAts.trackLimit.last.Limit),
+                D(TGMTAts.trackLimit.current.Location), D(TGMTAts.trackLimit.current.Limit),
+                D(TGMTAts.trackLimit.next.Location), D(TGMTAts.trackLimit.next.Limit)
+            );
             foreach (var limit in TGMTAts.trackLimit.trackLimits) {
                 sb.AppendFormat("{0,6}: {1,-2} ;", D(limit.Location), D(limit.Limit));
             }

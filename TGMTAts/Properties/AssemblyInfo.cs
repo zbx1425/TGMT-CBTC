@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("BlocklyAts Unmanaged Export Middleware")]
-[assembly: AssemblyDescription("Expose unmanaged functions, and relay calls to BlocklyAts assembly program.")]
+[assembly: AssemblyTitle("TGMT Ats for BVE5/6")]
+[assembly: AssemblyDescription("TRAINGUARD MT Ats Plugin for BVE Trainsim 5/6")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Zbx1425")]
-[assembly: AssemblyProduct("BlocklyAts Unmanaged Export Middleware")]
-[assembly: AssemblyCopyright("Copyright © Zbx1425 2020")]
+[assembly: AssemblyProduct("TRAINGUARD MT Ats Plugin for BVE Trainsim 5/6")]
+[assembly: AssemblyCopyright("Copyright © Zbx1425 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // すべての値を指定するか、次を使用してビルド番号とリビジョン番号を既定に設定できます
 // 以下のように '*' を使用します:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.1.0.0")]
+[assembly: AssemblyFileVersion("0.1.0.0")]

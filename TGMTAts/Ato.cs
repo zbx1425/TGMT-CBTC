@@ -96,7 +96,9 @@ namespace TGMTAts {
                     && (StationManager.NextStation.StopPosition - TGMTAts.location > Config.StationStartDistance 
                         || StationManager.Arrived)
                     // 离移动授权终点太近不能接通ATO (这是现实情况吗？)
-                    && (TGMTAts.movementEndpoint.Location - TGMTAts.location > 50 || TGMTAts.releaseSpeed);
+                    && (TGMTAts.movementEndpoint.Location - TGMTAts.location > 50 || TGMTAts.releaseSpeed)
+                    // CTC下离前车太近不能接通ATO (这是现实情况吗？)
+                    && (TGMTAts.signalMode == 1 || PreTrainManager.GetEndpoint().Location - TGMTAts.location > 50);
         }
     }
 }
