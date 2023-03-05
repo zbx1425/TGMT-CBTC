@@ -22,7 +22,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
@@ -136,11 +135,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(PlatformName)==x86 (
-COPY /Y $(TargetDir)x86\*.dll $(SolutionDir)..\Ats32
-) else (
-COPY /Y $(TargetDir)x64\*.dll $(SolutionDir)..\Ats64
-)</PostBuildEvent>
+    <PostBuildEvent>COPY "J:\Users\Administrator\Source\Repos\TGMT-CBTC-v1.0.0\TGMTAts\$(OutDir)x64\$(TargetFileName)" "I:\BveTs\Scenarios\TGMT_i\Ats64\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <DllExportIdent>8BC69933-F5AF-41DA-88E8-18BD0177ED8E</DllExportIdent>

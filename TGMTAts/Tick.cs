@@ -23,6 +23,7 @@ namespace TGMTAts {
             ackMessage = 0;
             location = state.Location;
             time = state.Time;
+            sound[0] = sound[1] = sound[2] = 2;
 
             var handles = new AtsHandles { Power = pPower, Brake = pBrake,
                 Reverser = pReverser, ConstantSpeed = AtsCscInstruction.Continue };
@@ -138,14 +139,20 @@ namespace TGMTAts {
 
             // 显示出发与屏蔽门信息
             if (signalMode > 1 && state.Speed == 0) {
-                if (Math.Abs(StationManager.NextStation.StopPosition - location) < Config.DoorEnableWindow
-                    && time > StationManager.NextStation.DepartureTime - Config.DepartRequestTime * 1000) {
-                    panel[32] = 2;
-                } else if (doorOpen && time - doorOpenTime >= 3000) {
-                    panel[32] = 1;
-                } else {
-                    panel[32] = 0;
-                }
+                    if (Math.Abs(StationManager.NextStation.StopPosition - location) < Config.DoorEnableWindow
+                        && time > StationManager.NextStation.DepartureTime - Config.DepartRequestTime * 1000 && !doorOpen && StationManager.Arrived){
+                        panel[32] = 2;
+                    }else if (Math.Abs(StationManager.NextStation.StopPosition - location) < Config.DoorEnableWindow
+                        && time - doorOpenTime >= Config.CloseRequestShowTime * 1000 && doorOpen && StationManager.NextStation.DepartureTime - time < Config.TrainHoldShowTime * 1000 && StationManager.Arrived)
+                {
+                        panel[32] = 1;
+                        sound[1] = 1;
+                    }else if (Math.Abs(StationManager.NextStation.StopPosition - location) < Config.DoorEnableWindow
+                        && StationManager.NextStation.DepartureTime - time >= Config.TrainHoldShowTime * 1000){
+                        panel[32] = 4;
+                    }else{
+                        panel[32] = 0;
+                    }
             } else {
                 panel[32] = 0;
             }
@@ -235,7 +242,7 @@ namespace TGMTAts {
                         handles.Brake = vehicleSpec.BrakeNotches + 1;
                     } else if (driveMode == 1 && state.Speed > recommendSpeed) {
                         // 超出建议速度，显示警告
-                        if (panel[10] == 0) sound[0] = 1;
+                        if (panel[10] == 0) sound[2] = 1;
                         panel[10] = 1;
                     } else {
                         panel[10] = 0;
@@ -337,15 +344,29 @@ namespace TGMTAts {
                         }
                         if (state.Speed == 0) {
                             // 停稳, 可以解锁车门, 解锁对应方向车门
-                            if (StationManager.NextStation.OpenLeftDoors) {
+                            if (StationManager.NextStation.DoorOpenType == 1){
                                 panel[27] = 1;
-                            } else if (StationManager.NextStation.OpenRightDoors) {
-                                panel[27] = 2;
-                            } else {
+                            }else if (StationManager.NextStation.DoorOpenType == 2){
+                                panel[27] = 3;
+                            }else if (StationManager.NextStation.DoorOpenType == 3){
+                                panel[27] = 6;
+                            }else if (StationManager.NextStation.DoorOpenType == 4){
+                                panel[27] = 5;
+                            }else if (StationManager.NextStation.DoorOpenType == 5){
+                                panel[27] = 7;
+                            }else{
                                 panel[27] = 0;
                             }
                             if (doorOpen) {
-                                panel[27] += 2; // 切换成已开门图像
+                                if (StationManager.NextStation.OpenLeftDoors){
+                                    panel[27] = 2;
+                                }else if (StationManager.NextStation.OpenRightDoors){
+                                    panel[27] = 4;
+                                }else if (StationManager.NextStation.OpenRightDoors && StationManager.NextStation.OpenLeftDoors){
+                                    panel[27] = 8;
+                                }else{
+                                    panel[27] = 9;
+                                }
                             }
                         } else {
                             panel[27] = 0;
@@ -363,9 +384,11 @@ namespace TGMTAts {
                 if (signalMode == 0) {
                     // RM-IXL, 门要是开了就当它按了门允许, 没有车门使能和停车窗口指示
                     panel[26] = 0;
-                    panel[27] = doorOpen ? 5 : 0;
+                    panel[27] = doorOpen ? 10 : 0;
                 }
             }
+
+            if (StationManager.NextStation.Pass && Math.Abs(StationManager.NextStation.StopPosition - location) < Config.StationStartDistance + 200) panel[32] = 3;
 
             // 信号灯
             if (signalMode >= 2) {

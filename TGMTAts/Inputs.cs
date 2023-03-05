@@ -94,6 +94,12 @@ namespace TGMTAts{
                 case 96823:
                     StationManager.SetBeacon(data);
                     break;
+                case 96825:
+                    DestinationNumber = data.Optional;
+                    break;
+                case 96826:
+                    TrainNumber = data.Optional;
+                    break;
                 case 96828:
                 case 96829:
                     PreTrainManager.SetBeacon(data);
@@ -140,6 +146,8 @@ namespace TGMTAts{
             releaseSpeed = false;
             ebState = 0;
             ackMessage = 0;
+
+            DestinationNumber = TrainNumber = 0;
 
             Ato.ResetCache();
             PreTrainManager.ResetCache();
