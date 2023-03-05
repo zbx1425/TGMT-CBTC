@@ -38,9 +38,9 @@ namespace TGMTAts {
                 decelB += 2;
             }
 
-            if (staDist < 0.6 && !StationManager.Arrived) {
+            if (staDist < 0.6 && !StationManager.Arrived && !StationManager.NextStation.Pass) {
                 return 2; // 这大概停得住吧?
-            } else if (staDist < -0.3 && !StationManager.Arrived) {
+            } else if (staDist < -0.3 && !StationManager.Arrived && !StationManager.NextStation.Pass) {
                 return 5; // 好像要冲标了，赶紧停车
             //} else if (staDist < 20 && !StationManager.Arrived) {
             //    return Math.Min(decelA, decelB);

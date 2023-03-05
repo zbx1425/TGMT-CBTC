@@ -12,8 +12,11 @@ namespace TGMTAts {
             public int RouteOpenTime = 0;
             public int DepartureTime = 0;
             public int DoorOpenType = 0;
-            public bool OpenLeftDoors { get { return DoorOpenType == 1 || DoorOpenType == 3; } }
-            public bool OpenRightDoors { get { return DoorOpenType == 2 || DoorOpenType == 3; } }
+            //增加功能 跳停
+            public bool Pass = false;
+            //增加/更改开门类型 3为左右同时开启 4为先释放左门 5为先释放右门
+            public bool OpenLeftDoors { get { return DoorOpenType == 1 || DoorOpenType == 3 || DoorOpenType == 4 || DoorOpenType == 5; } }
+            public bool OpenRightDoors { get { return DoorOpenType == 2 || DoorOpenType == 3 || DoorOpenType == 4 || DoorOpenType == 5; } }
         }
 
         public static Station NextStation = new Station();
@@ -25,7 +28,8 @@ namespace TGMTAts {
         public static void SetBeacon(TGMTAts.AtsBeaconData data) {
             switch (data.Type) {
                 case 96820:
-                    NextStation.StopPosition = data.Optional;
+                    NextStation.StopPosition = Math.Abs(data.Optional);
+                    NextStation.Pass = data.Optional < 0;
                     TGMTAts.Log("车站停车位置 " + NextStation.StopPosition.ToString());
                     break;
                 case 96821:
@@ -58,14 +62,18 @@ namespace TGMTAts {
         }
 
         public static SpeedLimit RecommendCurve() {
-            if (NextStation.StopPosition >= (int)Config.LessInf) {
+            if (NextStation.Pass){
                 return SpeedLimit.inf;
-            } else if (Arrived) {
-                return SpeedLimit.inf;
-            } else if (Stopped) {
-                return new SpeedLimit(0, 0);
-            } else {
-                return new SpeedLimit(0, NextStation.StopPosition);
+            }else{
+                if (NextStation.StopPosition >= (int)Config.LessInf){
+                    return SpeedLimit.inf;
+                }else if (Arrived){
+                    return SpeedLimit.inf;
+                }else if (Stopped){
+                    return new SpeedLimit(0, 0);
+                }else{
+                    return new SpeedLimit(0, NextStation.StopPosition);
+                }
             }
         }
 

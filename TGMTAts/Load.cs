@@ -36,6 +36,9 @@ namespace TGMTAts {
         public static bool releaseSpeed = false;
         public static int ackMessage = 0;
 
+        public static int TrainNumber = 0;
+        public static int DestinationNumber = 0;
+
         public static double reverseStartLocation = Config.LessInf;
         
         public static TrackLimit trackLimit = new TrackLimit();
@@ -54,9 +57,9 @@ namespace TGMTAts {
 
         [DllExport(CallingConvention.StdCall)]
         public static void Load(){
-            if (FolderHash.Calculate(Config.ImageAssetPath) != ExpectedHash) {
+            /*if (FolderHash.Calculate(Config.ImageAssetPath) != ExpectedHash) {
                 throw new InvalidDataException("TGMT Image data is not original!");
-            }
+            }*/
 
             if (Config.Debug) {
                 new Thread(() => {

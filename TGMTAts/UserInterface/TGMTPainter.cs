@@ -54,19 +54,19 @@ namespace TGMTAts {
         public static Bitmap PaintHMI(TGMTAts.AtsIoArray panel, TGMTAts.AtsVehicleState state) {
             GDI32.DrawImage(hmi, 0, 0);
 
-            GDI32.DrawImage(menu, 700, 60, panel[23] * 60, 60);
-            GDI32.DrawImage(drvmode, 589, 133, panel[24] * 50, 50);
-            GDI32.DrawImage(sigmode, 686, 133, panel[25] * 50, 50);
-            GDI32.DrawImage(stopsig, 686, 200, panel[26] * 50, 50);
-            GDI32.DrawImage(dorrel, 589, 267, panel[27] * 50, 50);
-            GDI32.DrawImage(dormode, 589, 337, panel[28] * 50, 50);
-            GDI32.DrawImage(departure, 686, 267, panel[32] * 50, 50);
-            GDI32.DrawImage(emergency, 686, 337, panel[29] * 50, 50);
-            GDI32.DrawImage(fault, 589, 405, panel[30] * 50, 50);
-            GDI32.DrawImage(special, 686, 405, panel[31] * 50, 50);
+            GDI32.DrawImage(menu, 681, 66, panel[23] * 64, 64);
+            GDI32.DrawImage(drvmode, 589, 133, panel[24] * 64, 64);
+            GDI32.DrawImage(sigmode, 686, 133, panel[25] * 64, 64);
+            GDI32.DrawImage(stopsig, 686, 200, panel[26] * 64, 64);
+            GDI32.DrawImage(dorrel, 589, 267, panel[27] * 64, 64);
+            GDI32.DrawImage(dormode, 589, 337, panel[28] * 64, 64);
+            GDI32.DrawImage(departure, 686, 267, panel[32] * 64, 64);
+            GDI32.DrawImage(emergency, 686, 337, panel[29] * 64, 64);
+            GDI32.DrawImage(fault, 589, 405, panel[30] * 64, 64);
+            GDI32.DrawImage(special, 686, 405, panel[31] * 64, 64);
             GDI32.DrawImage(ackcmd, 490, 472, panel[35] * 100, 100);
-            GDI32.DrawImage(atoctrl, 32, 405, panel[21] * 50, 50);
-            GDI32.DrawImage(selmode, 150, 405, panel[22] * 50, 50);
+            GDI32.DrawImage(atoctrl, 32, 405, panel[21] * 64, 64);
+            GDI32.DrawImage(selmode, 150, 405, panel[22] * 64, 64);
 
             if (panel[18] == 0) {
                 GDI32.DrawImage(num0, 64, 120, D(panel[17], 0) * 18, 18);
@@ -75,6 +75,16 @@ namespace TGMTAts {
             }
             GDI32.DrawImage(num0, 289, 212, D((int)state.Speed, 0) * 18, 18);
             GDI32.DrawImage(numn0, 275, 212, D((int)state.Speed, 1) * 18, 18);
+
+            GDI32.DrawImage(num0, 562, 31, D(TGMTAts.TrainNumber, 0) * 18, 18);
+            GDI32.DrawImage(num0, 548, 31, D(TGMTAts.TrainNumber, 1) * 18, 18);
+            GDI32.DrawImage(num0, 534, 31, D(TGMTAts.TrainNumber, 2) * 18, 18);
+            GDI32.DrawImage(num0, 520, 31, D(TGMTAts.TrainNumber, 3) * 18, 18);
+            GDI32.DrawImage(num0, 506, 31, D(TGMTAts.TrainNumber, 4) * 18, 18);
+
+            GDI32.DrawImage(num0, 648, 31, D(TGMTAts.DestinationNumber, 0) * 18, 18);
+            GDI32.DrawImage(num0, 634, 31, D(TGMTAts.DestinationNumber, 1) * 18, 18);
+            GDI32.DrawImage(num0, 620, 31, D(TGMTAts.DestinationNumber, 2) * 18, 18);
 
             var sec = state.Time / 1000 % 60;
             var min = state.Time / 1000 / 60 % 60;
@@ -134,7 +144,7 @@ namespace TGMTAts {
             return bmptdt;
         }
 
-        static int[] pow10 = new int[] { 1, 10, 100, 1000 };
+        static int[] pow10 = new int[] { 1, 10, 100, 1000, 10000, 100000 };
 
         static int D(int src, int digit) {
             if (pow10[digit] > src) {
@@ -157,7 +167,7 @@ namespace TGMTAts {
         static Pen circlePen = new Pen(Color.White, 5);
         static Pen ackPen = new Pen(Color.Yellow, 4);
         static Brush[] targetColor = new Brush[] { new SolidBrush(Color.Red), new SolidBrush(Color.Orange), new SolidBrush(Color.Green) };
-        static Brush[] overspeed = new Brush[] { new SolidBrush(Color.Black), new SolidBrush(Color.Orange), new SolidBrush(Color.Red) };
+        static Brush[] overspeed = new Brush[] { new SolidBrush(Color.Empty), new SolidBrush(Color.Orange), new SolidBrush(Color.Red) };
         static int hmi, ackcmd, atoctrl, dormode, dorrel, drvmode, emergency, fault, departure, menu,
             selmode, sigmode, special, stopsig, num0, numn0, colon;
     }
