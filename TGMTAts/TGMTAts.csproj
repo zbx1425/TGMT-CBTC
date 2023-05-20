@@ -80,7 +80,7 @@
   <PropertyGroup>
     <HarmonyFramework>net45</HarmonyFramework>
     <SlimDXFramework>NET40</SlimDXFramework>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <HarmonyFramework Condition="'$(Platform)' == 'x86'">net35</HarmonyFramework>
     <SlimDXFramework Condition="'$(Platform)' == 'x86'">NET20</SlimDXFramework>
     <TargetFrameworkVersion Condition="'$(Platform)' == 'x86'">v3.5</TargetFrameworkVersion>
