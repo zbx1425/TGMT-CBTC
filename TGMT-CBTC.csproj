@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5EBD2733-0CF7-4DD6-9791-6970FFC39871}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TGMT_CBTC</RootNamespace>
+    <AssemblyName>TGMT-CBTC</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AtsEx.CoreExtensions, Version=1.0.41005.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\AtsEx.CoreExtensions.1.0.0-rc.10\lib\AtsEx.CoreExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="AtsEx.PluginHost, Version=1.0.41005.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\AtsEx.PluginHost.1.0.0-rc.10\lib\AtsEx.PluginHost.dll</HintPath>
+    </Reference>
+    <Reference Include="BveTypes, Version=1.0.41005.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\AtsEx.PluginHost.1.0.0-rc.10\lib\BveTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="FastCaching, Version=1.0.31118.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\AtsEx.PluginHost.1.0.0-rc.10\lib\FastCaching.dll</HintPath>
+    </Reference>
+    <Reference Include="FastMember, Version=1.0.40401.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\AtsEx.PluginHost.1.0.0-rc.10\lib\FastMember.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="TypeWrapping, Version=1.0.40627.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\AtsEx.PluginHost.1.0.0-rc.10\lib\TypeWrapping.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="HMI\GDIHelper.cs" />
+    <Compile Include="HMI\HMIWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HMI\HMIWindow.Designer.cs">
+      <DependentUpon>HMIWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HMI\TGMTPainter.cs" />
+    <Compile Include="KeyHandler.cs" />
+    <Compile Include="OBCU\ATO.cs" />
+    <Compile Include="OBCU\CATSTargets.cs" />
+    <Compile Include="OBCU\DriveMode.cs" />
+    <Compile Include="OBCU\LineLimitTargets.cs" />
+    <Compile Include="OBCU\OBCU.cs" />
+    <Compile Include="OBCU\PidAto.cs" />
+    <Compile Include="OBCU\SpeedTarget.cs" />
+    <Compile Include="OBCU\StationTargets.cs" />
+    <Compile Include="TGMT.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="OBCU\Train.cs" />
+    <Compile Include="Units.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HMI\HMIWindow.resx">
+      <DependentUpon>HMIWindow.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /y "$(TargetPath)" "C:\Users\Public\Documents\AtsEx\1.0\Extensions"</PostBuildEvent>
+  </PropertyGroup>
+</Project>
