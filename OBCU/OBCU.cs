@@ -22,6 +22,7 @@ namespace TGMT_CBTC.OBCU {
         public double RedSpeed { get; private set; }
         public double? TargetSpeed { get; private set; }
         public double? TargetLocation { get; private set; }
+        public double YellowSpeedAccel { get; private set; }
         public bool AtpExceedRcmd { get; private set; }
         public bool AtpEmergency { get; private set; }
 
@@ -43,6 +44,7 @@ namespace TGMT_CBTC.OBCU {
             ComputeTargets();
             ComputeAtp();
             ComputeAto(scenario.Vehicle);
+            ComputeHoldBrake(scenario.Vehicle);
         }
 
         private void ComputeTargets() {
@@ -59,6 +61,7 @@ namespace TGMT_CBTC.OBCU {
             });
             RedSpeed = redTarget.Effective.GetTargetAt(Train.Location, 1.2);
             YellowSpeed = yellowTarget.Effective.GetTargetAt(Train.Location, 0.8);
+            YellowSpeedAccel = yellowTarget.Effective.GetAccelAt(Train.Location, 0.8);
             TargetSpeed = yellowTarget.Upcoming?.Speed;
             TargetLocation = yellowTarget.Upcoming?.Location;
         }
@@ -67,6 +70,7 @@ namespace TGMT_CBTC.OBCU {
             if (!Train.DoorClosed) {
                 RedSpeed = 0;
                 YellowSpeed = 0;
+                YellowSpeedAccel = 0;
                 TargetSpeed = null;
                 TargetLocation = null;
             }
@@ -84,9 +88,9 @@ namespace TGMT_CBTC.OBCU {
                 DriveMode = DriveMode.SM;
             }
             if (DriveMode < DriveMode.AM) return;
-            ATO.Kp = 9;
-            ATO.Ki = 0.3;
-            ATO.Kd = 12;
+            ATO.Kp = 4;
+            ATO.Ki = 30;
+            ATO.Kd = 3;
             ATO.Tick(this);
             if (Train.DoorClosed) {
                 int cmdNotch = ATO.CommandNotch;
@@ -101,6 +105,18 @@ namespace TGMT_CBTC.OBCU {
                 vehicle.Instruments.AtsPlugin.AtsHandles.PowerNotch = 0;
                 vehicle.Instruments.AtsPlugin.AtsHandles.BrakeNotch = 3;
                 DriveMode = DriveMode.AMInterrupted;
+            }
+        }
+
+        private void ComputeHoldBrake(Vehicle vehicle) {
+            if (Train.Speed < 0.1 && !(
+                vehicle.Instruments.Cab.Handles.PowerNotch > 0
+                || vehicle.Instruments.AtsPlugin.AtsHandles.PowerNotch > 0)) {
+                int holdNotch = 3;
+                if (vehicle.Instruments.Cab.Handles.BrakeNotch < holdNotch
+                    && vehicle.Instruments.AtsPlugin.AtsHandles.BrakeNotch < holdNotch) {
+                    vehicle.Instruments.AtsPlugin.AtsHandles.BrakeNotch = holdNotch;
+                }
             }
         }
 

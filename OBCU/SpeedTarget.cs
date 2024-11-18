@@ -25,6 +25,14 @@ namespace TGMT_CBTC {
             }
         }
 
+        public double GetAccelAt(double location, double deceleration) {
+            if (location < Location) {
+                return -deceleration;
+            } else {
+                return 0;
+            }
+        }
+
         public static SpeedTarget LineSpeed(double location, double speed) {
             return new SpeedTarget(location, speed, true);
         }

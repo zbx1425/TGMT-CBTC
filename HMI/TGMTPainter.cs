@@ -51,7 +51,7 @@ namespace TGMT_CBTC.HMI {
             hHMI.Dispose();
             hTDT.Dispose();
         }
-        
+
         public static GDIHelper PaintHMI(OBCU.OBCU obcu) {
             int[] panel = new int[256];
             hHMI.BeginGDI();
@@ -123,7 +123,9 @@ namespace TGMT_CBTC.HMI {
                 hHMI.Graphics.DrawRectangle(ackPen, new Rectangle(488, 470, 280, 100));
             }
 
-            hHMI.Graphics.DrawString(obcu.ATO.CommandAccel.ToString("0.00"), SystemFonts.CaptionFont, Brushes.Orange, 32, 395);
+            Font debugFont = new Font("Consolas", 10, FontStyle.Bold);
+            hHMI.Graphics.DrawString("Acmd=" + obcu.ATO.CommandAccel.ToString("0.00"), debugFont, Brushes.Orange, 32, 395);
+            hHMI.Graphics.DrawString("Ncmd=" + obcu.ATO.CommandNotch.ToString(), debugFont, Brushes.Orange, 32, 415);
 
             var tSpeed = (obcu.Train.Speed / obcu.Train.MaxSpeed * 288 - 144) / 180 * Math.PI;
             hHMI.Graphics.DrawEllipse(circlePen, new Rectangle(255, 188, 66, 66));
@@ -132,7 +134,7 @@ namespace TGMT_CBTC.HMI {
                 Poc(288, 221, 163, 0, tSpeed), Poc(288, 221, 123, -5, tSpeed), Poc(288, 221, 123, 5, tSpeed)
             });
             // hHMI.Graphics.DrawArc(ebSpeedPen, 288 - 175, 221 - 175, 175 * 2, 175 * 2, (float)panel[16] / 480 * 288 - 144 - 90, 288 - (float)panel[16] / 480 * 288);
-            if (obcu.DriveMode == DriveMode.SM) {
+            if (obcu.DriveMode == DriveMode.SM || true) {
                 var tRecommend = (obcu.YellowSpeed / obcu.Train.MaxSpeed * 288 - 144) / 180 * Math.PI;
                 hHMI.Graphics.FillPolygon(Brushes.Yellow, new Point[] {
                     Poc(288, 221, 165, 0, tRecommend), Poc(288, 221, 185, -11, tRecommend), Poc(288, 221, 185, 11, tRecommend)

@@ -10,7 +10,7 @@ namespace TGMT_CBTC.OBCU {
     public class PidAto {
 
         public double Kp, Ki, Kd;
-        private double ek_1, ek_2, uk_1;
+        private double ek_1, ek_2, uk_1, v_1;
         private int lastTime;
 
         public double CommandAccel { get; set; }
@@ -35,26 +35,37 @@ namespace TGMT_CBTC.OBCU {
             if (lastTime == 0) {
                 lastTime = obcu.Train.Time;
                 ek_1 = ek_2 = error;
+                v_1 = currentSpeed;
                 return;
             }
 
-            double dt = (obcu.Train.Time - lastTime) / 1000;
-            if (dt < 0 || dt > 10) {
+            double dt = (obcu.Train.Time - lastTime) / 1000.0;
+            if (dt < -0 || dt > 10) {
                 Reset();
                 return;
             }
             if (dt < 0.1) return;
+            lastTime = obcu.Train.Time;
 
-            double a0 = Kp + Ki * dt + Kd / dt;
-            double a1 = -Kp - 2 * Kd / dt;
-            double a2 = Kd / dt;
+            double dCurrentSpeed = (currentSpeed - v_1) / dt;
+            double dTargetSpeed = obcu.YellowSpeedAccel;
 
-            double u = a0 * error + a1 * ek_1 + a2 * ek_2 + uk_1;
+            // double a0 = Kp + Ki * dt + Kd / dt;
+            // double a1 = -Kp - 2 * Kd / dt;
+            // double a2 = Kd / dt;
+            double a0 = Kp + Ki * dt;
+            double a1 = -Kp;
+            double a2 = 0;
+
+            double dError = dTargetSpeed - dCurrentSpeed;
+
+            double u = a0 * error + a1 * ek_1 + a2 * ek_2 + uk_1 + (Kd * dt) * dError;
             ek_2 = ek_1;
             ek_1 = error;
+            v_1 = currentSpeed;
 
             CommandAccel = u;
-            if (obcu.YellowSpeed <= 2) {
+            if (obcu.YellowSpeed <= 1) {
                 CommandAccel = Math.Min(CommandAccel, -2.5);
             }
             if (CommandAccel < 0) {
