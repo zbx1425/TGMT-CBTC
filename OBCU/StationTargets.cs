@@ -15,7 +15,7 @@ namespace TGMT_CBTC.OBCU {
         public List<SpeedTarget> Targets { get; private set; } = new List<SpeedTarget>();
 
         public StationTargets(Scenario scenario) {
-            Stations = scenario.Route.Stations;
+            Stations = scenario.Map.Stations;
             Targets.Add(SpeedTarget.Empty());
         }
 

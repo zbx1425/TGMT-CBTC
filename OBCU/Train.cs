@@ -29,8 +29,8 @@ namespace TGMT_CBTC {
         }
 
         public void Tick(Scenario scenario) {
-            Speed = scenario.LocationManager.SpeedMeterPerSecond * Units.MPS_TO_KMH;
-            Location = scenario.LocationManager.Location;
+            Speed = scenario.VehicleLocation.Speed * Units.MPS_TO_KMH;
+            Location = scenario.VehicleLocation.Location;
             Time = scenario.TimeManager.TimeMilliseconds;
             DoorClosed = scenario.Vehicle.Doors.AreAllClosed;
         }

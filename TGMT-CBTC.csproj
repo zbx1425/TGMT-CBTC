@@ -35,20 +35,15 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AtsEx.CoreExtensions, Version=1.0.41005.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\AtsEx.CoreExtensions.1.0.0-rc.10\lib\AtsEx.CoreExtensions.dll</HintPath>
+    <Reference Include="BveEx.CoreExtensions, Version=2.0.41222.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\BveEx.CoreExtensions.2.0.0\lib\BveEx.CoreExtensions.dll</HintPath>
     </Reference>
-    <Reference Include="AtsEx.PluginHost, Version=1.0.41005.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\AtsEx.PluginHost.1.0.0-rc.10\lib\AtsEx.PluginHost.dll</HintPath>
+    <Reference Include="BveEx.PluginHost, Version=2.0.41222.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\BveEx.PluginHost.2.0.0\lib\BveEx.PluginHost.dll</HintPath>
     </Reference>
-    <Reference Include="BveTypes, Version=1.0.41005.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\AtsEx.PluginHost.1.0.0-rc.10\lib\BveTypes.dll</HintPath>
-    </Reference>
-    <Reference Include="FastCaching, Version=1.0.31118.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\AtsEx.PluginHost.1.0.0-rc.10\lib\FastCaching.dll</HintPath>
-    </Reference>
-    <Reference Include="FastMember, Version=1.0.40401.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\AtsEx.PluginHost.1.0.0-rc.10\lib\FastMember.dll</HintPath>
+    <Reference Include="BveTypes, Version=2.0.41222.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Public\Documents\BveEx\2.0\BveTypes.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -58,9 +53,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TypeWrapping, Version=1.0.40627.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\AtsEx.PluginHost.1.0.0-rc.10\lib\TypeWrapping.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HMI\GDIHelper.cs" />
@@ -93,8 +85,11 @@
       <DependentUpon>HMIWindow.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="BveTypes.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y "$(TargetPath)" "C:\Users\Public\Documents\AtsEx\1.0\Extensions"</PostBuildEvent>
+    <PostBuildEvent>copy /y "$(TargetPath)" "C:\Users\Public\Documents\BveEx\2.0\Extensions"</PostBuildEvent>
   </PropertyGroup>
 </Project>

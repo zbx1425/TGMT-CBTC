@@ -57,19 +57,25 @@ namespace TGMT_CBTC.HMI {
             hHMI.BeginGDI();
             hHMI.DrawImage(hmi, 0, 0);
 
-            hHMI.DrawImage(menu, 700, 60, (obcu.Train.Speed == 0 ? 0 : 1) * 60, 60);
-            hHMI.DrawImage(drvmode, 589, 133, obcu.DriveMode.DisplayIndex() * 50, 50);
-            hHMI.DrawImage(sigmode, 686, 133, 2 * 50, 50);
-            hHMI.DrawImage(stopsig, 686, 200, panel[26] * 50, 50);
-            hHMI.DrawImage(dorrel, 589, 267, panel[27] * 50, 50);
-            hHMI.DrawImage(dormode, 589, 337, 1 * 50, 50);
-            hHMI.DrawImage(departure, 686, 267, panel[32] * 50, 50);
-            hHMI.DrawImage(emergency, 686, 337, panel[29] * 50, 50);
-            hHMI.DrawImage(fault, 589, 405, panel[30] * 50, 50);
-            hHMI.DrawImage(special, 686, 405, panel[31] * 50, 50);
+            hHMI.DrawImage(menu, 681, 66, (obcu.Train.Speed == 0 ? 0 : 1) * 64, 64);
+            hHMI.DrawImage(drvmode, 589, 133, obcu.DriveMode.DisplayIndex() * 64, 64);
+            hHMI.DrawImage(sigmode, 686, 133, 2 * 64, 64);
+            hHMI.DrawImage(stopsig, 686, 200, panel[26] * 64, 64);
+            hHMI.DrawImage(dorrel, 589, 267, panel[27] * 64, 64);
+            hHMI.DrawImage(dormode, 589, 337, 1 * 64, 64);
+            hHMI.DrawImage(departure, 686, 267, panel[32] * 64, 64);
+            hHMI.DrawImage(emergency, 686, 337, panel[29] * 64, 64);
+            hHMI.DrawImage(fault, 589, 405, panel[30] * 64, 64);
+            hHMI.DrawImage(special, 686, 405, panel[31] * 64, 64);
             hHMI.DrawImage(ackcmd, 490, 472, panel[35] * 100, 100);
-            hHMI.DrawImage(atoctrl, 32, 405, panel[21] * 50, 50);
-            hHMI.DrawImage(selmode, 150, 405, 4 * 50, 50);
+            if (obcu.DriveMode >= DriveMode.AM) {
+                if (Math.Abs(obcu.ATO.CommandAccel) < 0.2) {
+                    hHMI.DrawImage(atoctrl, 32, 405, 2 * 64, 64);
+                } else {
+                    hHMI.DrawImage(atoctrl, 32, 405, (-Math.Sign(obcu.ATO.CommandAccel) + 2) * 64, 64);
+                }
+            }
+            hHMI.DrawImage(selmode, 150, 405, 4 * 64, 64);
 
             if (obcu.TargetSpeed.HasValue) {
                 hHMI.DrawImage(num0, 64, 120, D((int)Math.Round(obcu.TargetSpeed.Value), 0) * 18, 18);
@@ -124,24 +130,24 @@ namespace TGMT_CBTC.HMI {
             }
 
             Font debugFont = new Font("Consolas", 10, FontStyle.Bold);
-            hHMI.Graphics.DrawString("Acmd=" + obcu.ATO.CommandAccel.ToString("0.00"), debugFont, Brushes.Orange, 32, 395);
-            hHMI.Graphics.DrawString("Ncmd=" + obcu.ATO.CommandNotch.ToString(), debugFont, Brushes.Orange, 32, 415);
+            // hHMI.Graphics.DrawString("Acmd=" + obcu.ATO.CommandAccel.ToString("0.00"), debugFont, Brushes.Orange, 32, 395);
+            // hHMI.Graphics.DrawString("Ncmd=" + obcu.ATO.CommandNotch.ToString(), debugFont, Brushes.Orange, 32, 415);
 
-            var tSpeed = (obcu.Train.Speed / obcu.Train.MaxSpeed * 288 - 144) / 180 * Math.PI;
+            var tSpeed = (obcu.Train.Speed / 100 * 288 - 144) / 180 * Math.PI;
             hHMI.Graphics.DrawEllipse(circlePen, new Rectangle(255, 188, 66, 66));
             hHMI.Graphics.DrawLine(needlePen, Poc(288, 221, 33, 0, tSpeed), Poc(288, 221, 125, 0, tSpeed));
             hHMI.Graphics.FillPolygon(Brushes.White, new Point[] {
                 Poc(288, 221, 163, 0, tSpeed), Poc(288, 221, 123, -5, tSpeed), Poc(288, 221, 123, 5, tSpeed)
             });
             // hHMI.Graphics.DrawArc(ebSpeedPen, 288 - 175, 221 - 175, 175 * 2, 175 * 2, (float)panel[16] / 480 * 288 - 144 - 90, 288 - (float)panel[16] / 480 * 288);
-            if (obcu.DriveMode == DriveMode.SM || true) {
-                var tRecommend = (obcu.YellowSpeed / obcu.Train.MaxSpeed * 288 - 144) / 180 * Math.PI;
+            if (obcu.DriveMode == DriveMode.SM) {
+                var tRecommend = (obcu.YellowSpeed / 100 * 288 - 144) / 180 * Math.PI;
                 hHMI.Graphics.FillPolygon(Brushes.Yellow, new Point[] {
                     Poc(288, 221, 165, 0, tRecommend), Poc(288, 221, 185, -11, tRecommend), Poc(288, 221, 185, 11, tRecommend)
                 });
             }
             if (panel[16] >= 0) {
-                var tLimit = (obcu.RedSpeed / obcu.Train.MaxSpeed * 288 - 144) / 180 * Math.PI;
+                var tLimit = (obcu.RedSpeed / 100 * 288 - 144) / 180 * Math.PI;
                 hHMI.Graphics.FillPolygon(Brushes.Red, new Point[] {
                     Poc(288, 221, 165, 0, tLimit), Poc(288, 221, 185, -11, tLimit), Poc(288, 221, 185, 11, tLimit)
                 });

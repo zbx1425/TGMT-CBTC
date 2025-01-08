@@ -20,17 +20,19 @@ namespace TGMT_CBTC.OBCU {
             Targets.Add(SpeedTarget.Empty());
         }
 
+        private const double LocationOffset = -5;
+
         public void Tick(Train train) {
             if (SectionManager.Sections.CurrentIndex >= 0 && SectionManager.Sections.CurrentIndex < SectionManager.Sections.Count) {
                 Targets[0] = SpeedTarget.LineSpeed(
-                    SectionManager.Sections[SectionManager.Sections.CurrentIndex].Location,
+                    SectionManager.Sections[SectionManager.Sections.CurrentIndex].Location + LocationOffset,
                     SectionManager.CurrentSectionSpeedLimit * Units.MPS_TO_KMH + SpeedOffset);
             } else {
                 Targets[0] = SpeedTarget.Empty();
             }
             if (SectionManager.Sections.CurrentIndex >= -1 && SectionManager.Sections.CurrentIndex < SectionManager.Sections.Count - 1) {
                 Targets[1] = SpeedTarget.LineSpeed(
-                    SectionManager.Sections[SectionManager.Sections.CurrentIndex + 1].Location,
+                    SectionManager.Sections[SectionManager.Sections.CurrentIndex + 1].Location + LocationOffset,
                     SectionManager.ForwardSectionSpeedLimit * Units.MPS_TO_KMH + SpeedOffset);
             } else {
                 Targets[1] = SpeedTarget.Empty();

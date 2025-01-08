@@ -16,7 +16,7 @@ namespace TGMT_CBTC {
         private void Init(Scenario scenario, Train train, double speedOffset) {
             List<AreaSpeedTarget> areaTargets = new List<AreaSpeedTarget>();
             List<double> interestedPoints = new List<double>();
-            foreach (var speedLimit in scenario.Route.SpeedLimits) {
+            foreach (var speedLimit in scenario.Map.SpeedLimits) {
                 if (areaTargets.Count > 0) {
                     areaTargets[areaTargets.Count - 1].LocationEnd 
                         = speedLimit.Location + train.Length;

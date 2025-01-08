@@ -26,17 +26,20 @@ namespace TGMT_CBTC.OBCU {
         public bool AtpExceedRcmd { get; private set; }
         public bool AtpEmergency { get; private set; }
 
+        public bool AtoStartProvided { get; private set; }
+
         public OBCU(Scenario scenario) {
             Train = new Train(scenario);
             LineLimitTargetsYellow = new LineLimitTargets(scenario, Train, 0);
             LineLimitTargetsRed = new LineLimitTargets(scenario, Train, 5);
             StationTargets = new StationTargets(scenario);
-            CATSTargetsYellow = new CATSTargets(scenario, 0);
+            CATSTargetsYellow = new CATSTargets(scenario, -0.4);
             CATSTargetsRed = new CATSTargets(scenario, 5);
             ATO = new PidAto(0, 0, 0);
         }
 
         public void Tick(TimeSpan elapsed, Scenario scenario) {
+            Train.MaxSpeed = 125;
             Train.Tick(scenario);
             StationTargets.Tick(Train);
             CATSTargetsYellow.Tick(Train);
@@ -80,6 +83,7 @@ namespace TGMT_CBTC.OBCU {
         }
 
         private void ComputeAto(Vehicle vehicle) {
+            AtoStartProvided = ATO.ShouldProvideATOStart(this, vehicle);
             if (DriveMode > DriveMode.SM && !(
                 vehicle.Instruments.Cab.Handles.PowerNotch == 0
                 && vehicle.Instruments.Cab.Handles.BrakeNotch == 0
@@ -93,6 +97,7 @@ namespace TGMT_CBTC.OBCU {
             ATO.Kd = 3;
             ATO.Tick(this);
             if (Train.DoorClosed) {
+                vehicle.Instruments.AtsPlugin.AtsHandles.ReverserPosition = ReverserPosition.F;
                 int cmdNotch = ATO.CommandNotch;
                 if (cmdNotch >= 0) {
                     vehicle.Instruments.AtsPlugin.AtsHandles.PowerNotch = cmdNotch;
@@ -121,7 +126,7 @@ namespace TGMT_CBTC.OBCU {
         }
 
         internal void OnAtoStartPressed(Scenario scenario) {
-            if (ATO.ShouldProvideATOStart(this, scenario.Vehicle)) {
+            if (AtoStartProvided) {
                 DriveMode = DriveMode.AM;
             }
         }

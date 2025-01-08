@@ -1,7 +1,7 @@
-﻿using AtsEx.Extensions.MapStatements;
-using AtsEx.PluginHost;
-using AtsEx.PluginHost.Plugins;
-using AtsEx.PluginHost.Plugins.Extensions;
+﻿using BveEx.Extensions.MapStatements;
+using BveEx.PluginHost;
+using BveEx.PluginHost.Plugins;
+using BveEx.PluginHost.Plugins.Extensions;
 using BveTypes.ClassWrappers;
 using System;
 using System.Collections.Generic;
@@ -20,13 +20,13 @@ namespace TGMT_CBTC {
 
         public OBCU.OBCU OBCU { get; private set; }
 
-        private HMIWindow hmiWindow = new HMIWindow();
+        private HMIWindow hmiWindow;
         private KeyHandler keyHandler = new KeyHandler();
 
         public TGMT(PluginBuilder builder) : base(builder) {
             BveHacker.ScenarioCreated += OnScenarioCreated;
+            BveHacker.ScenarioClosed += OnScenarioClosed;
             TGMTPainter.Initialize();
-            hmiWindow.Show();
             keyHandler.Init(BveHacker);
             keyHandler.AtoStartPressed += OnAtoStartPressed;
         }
@@ -34,19 +34,28 @@ namespace TGMT_CBTC {
         private void OnScenarioCreated(ScenarioCreatedEventArgs e) {
             Scenario = e.Scenario;
             OBCU = new OBCU.OBCU(Scenario);
+            hmiWindow = new HMIWindow();
+            hmiWindow.Show();
+        }
+        private void OnScenarioClosed(EventArgs e) {
+            Scenario = null;
+            OBCU = null;
+            if (hmiWindow != null) hmiWindow.Close();
+            hmiWindow = null;
         }
 
         TimeSpan paintTimeDelay = TimeSpan.FromMilliseconds(1000);
 
-        public override TickResult Tick(TimeSpan elapsed) {
+        public override void Tick(TimeSpan elapsed) {
+            if (OBCU == null) return;
             OBCU.Tick(elapsed, Scenario);
             paintTimeDelay += elapsed;
             if (paintTimeDelay >= TimeSpan.FromMilliseconds(1000 / 8)) {
                 Bitmap hmiBitmap = TGMTPainter.PaintHMI(OBCU).Bitmap;
                 hmiWindow.DrawBitmap(hmiBitmap);
+                hmiWindow.HandleHMIInfo(OBCU);
                 paintTimeDelay = TimeSpan.Zero;
             }
-            return new ExtensionTickResult();
         }
 
         private void OnAtoStartPressed(object sender, EventArgs e) {
@@ -55,7 +64,7 @@ namespace TGMT_CBTC {
 
         public override void Dispose() {
             TGMTPainter.Dispose();
-            hmiWindow.Dispose();
+            if (hmiWindow != null) hmiWindow.Dispose();
         }
     }
 }
